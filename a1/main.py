@@ -21,6 +21,9 @@ def and_function(inputs):
 def or_function(inputs):
     return perceptron(inputs, [1,1], -.05)
 
+def nand_function(inputs):
+    return perceptron(inputs, [-1,-1], 1.5)
+
 def test(func, expected):
     inputs = [[0,0], [0,1], [1,0], [1,1]]
     
@@ -29,6 +32,7 @@ def test(func, expected):
         status = 'true' if result == exp else 'false'
         print(f"input: {inp} result: {result} expected: {exp} {status}")
 
-test(and_function, [0,0,0,1])
-test(or_function, [0,1,1,1])
+#test(and_function, [0,0,0,1])
+#test(or_function, [0,1,1,1])
+test(nand_function, [1,1,1,0])
 
