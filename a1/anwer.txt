@@ -1,0 +1,12 @@
+ReLU:
+
+u1 = nor_function weights: -1,-1 bias: 1
+u2 = and_function weights: 1,1 bias: -1
+z = nor_function weights: -1,-1 bias: 1
+
+
+Step:
+
+u1 = nand_function weights: -1,-1 bias: 1.5
+u2 = or_function weights: 1,1 bias: -.5
+z = and_function weights: 1,1 bias: -1.5

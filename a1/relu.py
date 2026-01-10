@@ -16,9 +16,6 @@ def and_function(inputs):
 def nor_function(inputs):
     return relu_perceptron(inputs, [-1, -1], 1)
 
-def nand_function(inputs):
-    return relu_perceptron(inputs, [-1,-1], 1.5)
-
 def xor_function(inputs):
     return nor_function([and_function(inputs), nor_function(inputs)])
 
@@ -32,6 +29,5 @@ def test(func, expected):
 
 #test(and_function, [0,0,0,1])
 test(nor_function, [1,0,0,0])
-#test(nand_function, [1,1,1,0])
 #test(xor_function, [0,1,1,0])
 
