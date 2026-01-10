@@ -1,14 +1,9 @@
 from os import write
 import numpy as np
 
-def step_perceptron(inputs, weights, bias):
+def relu_perceptron(inputs, weights, bias):
     total = np.dot(inputs, weights)
-    return step(total + bias)
-
-def step(input):
-    if input > 0:
-        return 1
-    return 0;
+    return relu(total + bias)
 
 def relu(input):
     if input > 0:
@@ -16,16 +11,19 @@ def relu(input):
     return 0;
 
 def and_function(inputs):
-    return step_perceptron(inputs, [1,1], -1.5)   
+    return relu_perceptron(inputs, [1,1], -1)   
 
 def or_function(inputs):
-    return step_perceptron(inputs, [1,1], -.5)
+    return relu_perceptron(inputs, [1,1], -.5)
+
+def nor_function(inputs):
+    return relu_perceptron(inputs, [-1, -1], .5)
 
 def nand_function(inputs):
-    return step_perceptron(inputs, [-1,-1], 1.5)
+    return relu_perceptron(inputs, [-1,-1], 1.5)
 
 def xor_function(inputs):
-    return and_function([nand_function(inputs), or_function(inputs)])
+    return nor_function([and_function(inputs), nor_function(inputs)])
 
 def test(func, expected):
     inputs = [[0,0], [0,1], [1,0], [1,1]]
@@ -37,6 +35,7 @@ def test(func, expected):
 
 #test(and_function, [0,0,0,1])
 #test(or_function, [0,1,1,1])
+#test(nor_function, [1,0,0,0])
 #test(nand_function, [1,1,1,0])
 test(xor_function, [0,1,1,0])
 
