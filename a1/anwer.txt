@@ -1,3 +1,5 @@
+xor_function
+
 ReLU:
 
 u1 = nor_function weights: -1,-1 bias: 1
