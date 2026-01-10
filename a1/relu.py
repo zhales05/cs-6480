@@ -28,6 +28,6 @@ def test(func, expected):
         print(f"input: {inp} result: {result} expected: {exp} {status}")
 
 #test(and_function, [0,0,0,1])
-test(nor_function, [1,0,0,0])
-#test(xor_function, [0,1,1,0])
+#test(nor_function, [1,0,0,0])
+test(xor_function, [0,1,1,0])
 
