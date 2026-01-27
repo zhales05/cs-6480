@@ -1,0 +1,112 @@
+Epoch 0, Loss: 0.3670
+Epoch 100, Loss: 0.0976
+Epoch 200, Loss: 0.0605
+Epoch 300, Loss: 0.0431
+Epoch 400, Loss: 0.0329
+Epoch 500, Loss: 0.0263
+Epoch 600, Loss: 0.0218
+Epoch 700, Loss: 0.0185
+Epoch 800, Loss: 0.0160
+Epoch 900, Loss: 0.0140
+Epoch 1000, Loss: 0.0125
+Epoch 1100, Loss: 0.0112
+Epoch 1200, Loss: 0.0102
+Epoch 1300, Loss: 0.0093
+Epoch 1400, Loss: 0.0086
+Epoch 1500, Loss: 0.0079
+Epoch 1600, Loss: 0.0074
+Epoch 1700, Loss: 0.0069
+Epoch 1800, Loss: 0.0065
+Epoch 1900, Loss: 0.0061
+Epoch 2000, Loss: 0.0057
+Epoch 2100, Loss: 0.0054
+Epoch 2200, Loss: 0.0052
+Epoch 2300, Loss: 0.0049
+Epoch 2400, Loss: 0.0047
+Epoch 2500, Loss: 0.0045
+Epoch 2600, Loss: 0.0043
+Epoch 2700, Loss: 0.0041
+Epoch 2800, Loss: 0.0039
+Epoch 2900, Loss: 0.0038
+Epoch 3000, Loss: 0.0036
+Epoch 3100, Loss: 0.0035
+Epoch 3200, Loss: 0.0034
+Epoch 3300, Loss: 0.0033
+Epoch 3400, Loss: 0.0032
+Epoch 3500, Loss: 0.0031
+Epoch 3600, Loss: 0.0030
+Epoch 3700, Loss: 0.0029
+Epoch 3800, Loss: 0.0028
+Epoch 3900, Loss: 0.0027
+Epoch 4000, Loss: 0.0027
+Epoch 4100, Loss: 0.0026
+Epoch 4200, Loss: 0.0025
+Epoch 4300, Loss: 0.0024
+Epoch 4400, Loss: 0.0024
+Epoch 4500, Loss: 0.0023
+Epoch 4600, Loss: 0.0023
+Epoch 4700, Loss: 0.0022
+Epoch 4800, Loss: 0.0022
+Epoch 4900, Loss: 0.0021
+Epoch 5000, Loss: 0.0021
+Epoch 5100, Loss: 0.0020
+Epoch 5200, Loss: 0.0020
+Epoch 5300, Loss: 0.0019
+Epoch 5400, Loss: 0.0019
+Epoch 5500, Loss: 0.0019
+Epoch 5600, Loss: 0.0018
+Epoch 5700, Loss: 0.0018
+Epoch 5800, Loss: 0.0018
+Epoch 5900, Loss: 0.0017
+Epoch 6000, Loss: 0.0017
+Epoch 6100, Loss: 0.0017
+Epoch 6200, Loss: 0.0016
+Epoch 6300, Loss: 0.0016
+Epoch 6400, Loss: 0.0016
+Epoch 6500, Loss: 0.0016
+Epoch 6600, Loss: 0.0015
+Epoch 6700, Loss: 0.0015
+Epoch 6800, Loss: 0.0015
+Epoch 6900, Loss: 0.0015
+Epoch 7000, Loss: 0.0014
+Epoch 7100, Loss: 0.0014
+Epoch 7200, Loss: 0.0014
+Epoch 7300, Loss: 0.0014
+Epoch 7400, Loss: 0.0014
+Epoch 7500, Loss: 0.0013
+Epoch 7600, Loss: 0.0013
+Epoch 7700, Loss: 0.0013
+Epoch 7800, Loss: 0.0013
+Epoch 7900, Loss: 0.0013
+Epoch 8000, Loss: 0.0012
+Epoch 8100, Loss: 0.0012
+Epoch 8200, Loss: 0.0012
+Epoch 8300, Loss: 0.0012
+Epoch 8400, Loss: 0.0012
+Epoch 8500, Loss: 0.0012
+Epoch 8600, Loss: 0.0012
+Epoch 8700, Loss: 0.0011
+Epoch 8800, Loss: 0.0011
+Epoch 8900, Loss: 0.0011
+Epoch 9000, Loss: 0.0011
+Epoch 9100, Loss: 0.0011
+Epoch 9200, Loss: 0.0011
+Epoch 9300, Loss: 0.0011
+Epoch 9400, Loss: 0.0010
+Epoch 9500, Loss: 0.0010
+Epoch 9600, Loss: 0.0010
+Epoch 9700, Loss: 0.0010
+Epoch 9800, Loss: 0.0010
+Epoch 9900, Loss: 0.0010
+
+Final predictions:
+[[5.1678373e-05]
+ [3.3909347e-02]
+ [3.3909347e-02]
+ [9.5973927e-01]]
+
+Expected:
+[[0.]
+ [0.]
+ [0.]
+ [1.]]
