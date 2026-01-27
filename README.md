@@ -27,6 +27,7 @@
 - Lecture #3: 21
 - Lecture #4: 41
 - Lecture #5: 112
+- Lecture #6: 612
 
 ```
 source venv/bin/activate
