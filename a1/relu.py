@@ -8,7 +8,7 @@ def relu_perceptron(inputs, weights, bias):
 def relu(input):
     if input > 0:
         return input
-    return 0;
+    return 0
 
 def and_function(inputs):
     return relu_perceptron(inputs, [1,1], -1)   
