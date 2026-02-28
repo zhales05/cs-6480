@@ -1,2 +1,4 @@
 CLAUDE.md
 .claude/settings.local.json
+.claude/worktrees/
+**/.claude/worktrees/
