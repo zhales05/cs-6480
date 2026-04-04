@@ -2,3 +2,7 @@ CLAUDE.md
 .claude/settings.local.json
 .claude/worktrees/
 **/.claude/worktrees/
+
+# Large audio files
+project/data/audio/*.mp3
+**/__pycache__/
