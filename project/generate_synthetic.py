@@ -64,26 +64,83 @@ AD_STYLES = ["conversational", "scripted", "blended"]
 
 # Fictional brand names
 BRANDS = [
+    # VPN / Security
     ("BrightPath VPN", "brightpath.com", "SECURE"),
+    ("TunnelGuard VPN", "tunnelguard.com", "GUARD"),
+    ("ShieldWave Security", "shieldwave.io", "SHIELD"),
+    # Coffee / Tea / Beverages
     ("GroundUp Coffee", "groundup.co", "BREW"),
-    ("FocusFrame Glasses", "focusframe.com", "CLEAR"),
-    ("NovaSleep Mattress", "novasleep.com", "REST"),
-    ("PeakMind App", "peakmind.io", "MIND"),
-    ("TrailBlaze Shoes", "trailblaze.com", "HIKE"),
     ("ZenBrew Tea", "zenbrew.co", "CALM"),
-    ("CloudNest Hosting", "cloudnest.dev", "LAUNCH"),
-    ("VitalFuel Bars", "vitalfuel.com", "FUEL"),
-    ("SoundWave Headphones", "soundwave.audio", "LISTEN"),
+    ("MorningPerk Coffee", "morningperk.com", "PERK"),
+    ("SteepLeaf Tea", "steepleaf.co", "STEEP"),
+    # Mattress / Sleep
+    ("NovaSleep Mattress", "novasleep.com", "REST"),
     ("DriftWell Sleep Aid", "driftwell.com", "DREAM"),
-    ("BoltCharge Cables", "boltcharge.co", "POWER"),
-    ("GreenPlate Meals", "greenplate.com", "FRESH"),
-    ("PageTurn Books", "pageturn.co", "READ"),
-    ("SwiftShip Delivery", "swiftship.com", "SHIP"),
+    ("CloudRest Mattress", "cloudrest.com", "SNOOZE"),
+    ("DeepSlumber Pillows", "deepslumber.co", "SLUMBER"),
+    # Productivity / Apps
+    ("PeakMind App", "peakmind.io", "MIND"),
     ("MindMap Notes", "mindmapnotes.com", "NOTES"),
-    ("PureAir Filters", "pureair.co", "BREATHE"),
-    ("CodeForge IDE", "codeforge.dev", "CODE"),
+    ("FocusZone App", "focuszone.io", "FOCUS"),
+    ("TaskPilot", "taskpilot.com", "PILOT"),
+    ("DayPlanner Pro", "dayplannerpro.com", "PLAN"),
+    # Fitness / Health
     ("FitPulse Watch", "fitpulse.com", "TRACK"),
+    ("VitalFuel Bars", "vitalfuel.com", "FUEL"),
+    ("FlexForm Fitness", "flexform.co", "FLEX"),
+    ("IronPath Supplements", "ironpath.com", "STRONG"),
+    ("PureGrit Protein", "puregrit.co", "GRIT"),
+    ("StrideCoach Running", "stridecoach.com", "STRIDE"),
+    # Glasses / Accessories
+    ("FocusFrame Glasses", "focusframe.com", "CLEAR"),
+    ("LensVault Eyewear", "lensvault.com", "VISION"),
+    # Shoes / Clothing
+    ("TrailBlaze Shoes", "trailblaze.com", "HIKE"),
+    ("UrbanSole Sneakers", "urbansole.co", "SOLE"),
+    ("ThreadLine Apparel", "threadline.com", "STYLE"),
+    # Hosting / Dev Tools
+    ("CloudNest Hosting", "cloudnest.dev", "LAUNCH"),
+    ("CodeForge IDE", "codeforge.dev", "CODE"),
+    ("StackDeploy Hosting", "stackdeploy.io", "DEPLOY"),
+    ("DevBridge Platform", "devbridge.dev", "BUILD"),
+    # Audio / Tech
+    ("SoundWave Headphones", "soundwave.audio", "LISTEN"),
+    ("BoltCharge Cables", "boltcharge.co", "POWER"),
+    ("EchoBase Speakers", "echobase.com", "ECHO"),
+    ("PixelCraft Monitors", "pixelcraft.co", "PIXEL"),
+    # Food / Meal delivery
+    ("GreenPlate Meals", "greenplate.com", "FRESH"),
+    ("NourishBox Meals", "nourishbox.co", "NOURISH"),
+    ("PantryDrop Delivery", "pantrydrop.com", "PANTRY"),
+    # Books / Education
+    ("PageTurn Books", "pageturn.co", "READ"),
+    ("BrainSpark Learning", "brainspark.io", "SPARK"),
+    ("LinguaLeap Language", "lingualeap.com", "LEAP"),
+    # Shipping / Logistics
+    ("SwiftShip Delivery", "swiftship.com", "SHIP"),
+    ("QuickRoute Shipping", "quickroute.co", "ROUTE"),
+    # Air / Home
+    ("PureAir Filters", "pureair.co", "BREATHE"),
+    ("HomeNest Furniture", "homenest.com", "NEST"),
+    ("BrightSpace Lighting", "brightspace.co", "LIGHT"),
+    # Skincare / Personal care
     ("Luminos Skincare", "luminos.co", "GLOW"),
+    ("ClearDerm Skincare", "clearderm.com", "DERM"),
+    ("FreshWave Grooming", "freshwave.co", "WAVE"),
+    # Finance / Fintech
+    ("CoinTrail Finance", "cointrail.com", "COIN"),
+    ("BudgetWise App", "budgetwise.io", "WISE"),
+    ("PayStream Payments", "paystream.co", "PAY"),
+    # Pet care
+    ("PawPath Pet Food", "pawpath.com", "PAW"),
+    ("TailWag Treats", "tailwag.co", "WAG"),
+    # Travel
+    ("WanderPass Travel", "wanderpass.com", "WANDER"),
+    ("JetSet Luggage", "jetsetluggage.co", "JET"),
+    # Miscellaneous
+    ("SafeVault Storage", "safevault.com", "VAULT"),
+    ("GreenLeaf Garden", "greenleaf.co", "GARDEN"),
+    ("CraftBench Tools", "craftbench.com", "CRAFT"),
 ]
 
 HOST_NAMES = [
@@ -101,7 +158,7 @@ GUEST_NAMES = [
 ]
 
 FILLER_WORDS = ["you know", "like", "um", "uh", "right", "I mean",
-                "honestly", "basically", "actually", "so", "well", "look"]
+                "so", "well", "look"]
 
 PODCAST_NAMES = {
     "tech": ["The Debug Log", "Silicon Minds", "Code & Coffee", "Byte Sized", "Tech Tangent"],
@@ -135,6 +192,47 @@ def lower_start(text):
     return text
 
 
+def whisper_artifacts(text):
+    """Simulate Whisper transcription noise on clean text."""
+    import re as _re
+    words = text.split()
+    result = []
+    for w in words:
+        # Drop apostrophes (~20% chance per contraction)
+        if "'" in w and random.random() < 0.2:
+            w = w.replace("'", "")
+        # Drop commas (~30% chance)
+        if w.endswith(",") and random.random() < 0.3:
+            w = w[:-1]
+        # Drop period to create run-on (~15% chance)
+        if w.endswith(".") and random.random() < 0.15:
+            w = w[:-1]
+        # Lowercase a capitalized word mid-sentence (~10% chance)
+        if len(result) > 0 and w and w[0].isupper() and random.random() < 0.1:
+            w = w[0].lower() + w[1:]
+        result.append(w)
+    text = " ".join(result)
+    # Occasional double spaces (Whisper alignment gaps)
+    if random.random() < 0.2:
+        words = text.split()
+        if len(words) > 10:
+            idx = random.randint(5, len(words) - 5)
+            words[idx] = words[idx] + " "
+            text = " ".join(words)
+    # Occasional number format switch: "twenty" <-> "20"
+    number_swaps = [
+        ("fifteen", "15"), ("twenty", "20"), ("twenty five", "25"),
+        ("thirty", "30"), ("fifty", "50"), ("ten", "10"),
+    ]
+    if random.random() < 0.25:
+        swap = random.choice(number_swaps)
+        if swap[0] in text:
+            text = text.replace(swap[0], swap[1], 1)
+        elif swap[1] in text:
+            text = text.replace(swap[1], swap[0], 1)
+    return text
+
+
 PADDING_PHRASES = [
     "And I think that is really the key thing here.",
     "Which is something I have been thinking about a lot lately.",
@@ -142,7 +240,7 @@ PADDING_PHRASES = [
     "I do not know if that makes sense but it is how I think about it.",
     "That is just my take on it though.",
     "It is one of those things where once you see it you cannot unsee it.",
-    "And honestly I think most people would agree with me on this.",
+    "And I think most people would agree with me on this.",
     "Which again I know is kind of a hot take but whatever.",
     "And look I could be wrong about this but I really do not think I am.",
     "I think the thing that people miss is how much context matters here.",
@@ -154,15 +252,22 @@ PADDING_PHRASES = [
     "It is wild to me that more people are not paying attention to this.",
     "And I want to be clear I am not saying this to be controversial or anything.",
     "Which by the way is a whole other conversation we should have at some point.",
-    "And the data backs this up too if you actually look at it.",
+    "And the data backs this up too if you look at it.",
     "I just think we need to be more honest about this stuff.",
 ]
 
 
-def pad_to_length(text, min_words=70, max_words=180):
-    """Pad text with natural-sounding phrases to hit target word count."""
+def pad_to_length(text, min_words=75, max_words=100):
+    """Pad or trim text to match real transcript word count (~88 mean)."""
     words = text.split()
     target = random.randint(min_words, max_words)
+    # Trim if already over target
+    if len(words) > target:
+        # Cut at a sentence-ish boundary near target
+        for i in range(target, min(target + 15, len(words))):
+            if words[i - 1].endswith((".","?","!")):
+                return " ".join(words[:i])
+        return " ".join(words[:target])
     while len(words) < target:
         phrase = random.choice(PADDING_PHRASES)
         # Insert at a sentence boundary (after a period)
@@ -176,14 +281,16 @@ def pad_to_length(text, min_words=70, max_words=180):
 
 
 def make_messy(text):
-    """Make text feel like a real transcript."""
+    """Make text feel like a real Whisper transcript."""
     text = pad_to_length(text)
-    text = add_filler(text, density=random.uniform(0.03, 0.12))
+    text = add_filler(text, density=random.uniform(0.02, 0.06))
     # Randomly drop some periods
     if random.random() < 0.3:
         text = text.replace(". ", " ", 1)
     # Randomly lowercase start
     text = lower_start(text)
+    # Apply Whisper-style transcription artifacts
+    text = whisper_artifacts(text)
     return text
 
 
@@ -192,10 +299,10 @@ def make_messy(text):
 def gen_host_read_ad(brand, url, code, genre, host, podcast_name):
     templates = [
         f"So I want to take a second to talk about {brand}. I've been using it for about a month now and I gotta say it's pretty solid. {random.choice(['The quality is just there.', 'It just works really well.', 'I was skeptical at first but now I recommend it to everyone.'])} If you want to check it out head to {url} slash {podcast_name.lower().replace(' ', '')} and you'll get a special deal. Seriously go check them out.",
-        f"Alright let me tell you about something I actually use. {brand}. {random.choice(['I started using this a few weeks ago', 'My co-host turned me onto this', 'A friend recommended this to me'])} and honestly I'm kind of hooked. The thing that sets it apart is just how {random.choice(['easy it is to use', 'well designed everything is', 'reliable it has been'])}. Head to {url} and use code {code} for {random.choice(['fifteen', 'twenty', 'twenty five'])} percent off your first order.",
+        f"Alright let me tell you about something I use every day. {brand}. {random.choice(['I started using this a few weeks ago', 'My co-host turned me onto this', 'A friend recommended this to me'])} and I'm kind of hooked. The thing that sets it apart is just how {random.choice(['easy it is to use', 'well designed everything is', 'reliable it has been'])}. Head to {url} and use code {code} for {random.choice(['fifteen', 'twenty', 'twenty five'])} percent off your first order.",
         f"Quick break to tell you about {brand}. Now I know I know every podcast is sponsored by something these days but I genuinely think this one is worth your time. {random.choice(['The customer service alone is incredible.', 'I have tried so many alternatives and nothing comes close.', 'Even my partner who is super picky about this stuff loves it.'])} Go to {url} slash {podcast_name.lower().replace(' ', '')} link is in the show notes.",
-        f"This episode is brought to you by {brand}. Look I've been in this space for a while and {brand} is one of the few products I actually stand behind. {random.choice(['They reached out to sponsor us and I said yes immediately because I was already a customer.', 'The team behind it really cares about quality.', 'It has made a real difference in my daily routine.'])} You can try it at {url} and use code {code} at checkout.",
-        f"Real quick I want to give a shout out to {brand} for making this episode possible. I started using {brand} {random.choice(['last month', 'a couple weeks ago', 'earlier this year'])} and it has been {random.choice(['a game changer honestly', 'really solid', 'exactly what I needed'])}. If you go to {url} and use code {code} you get your first {random.choice(['month', 'order', 'box'])} {random.choice(['free', 'half off', 'at a discount'])}.",
+        f"This episode is brought to you by {brand}. Look I've been in this space for a while and {brand} is one of the few products I stand behind. {random.choice(['They reached out to sponsor us and I said yes immediately because I was already a customer.', 'The team behind it really cares about quality.', 'It has made a real difference in my daily routine.'])} You can try it at {url} and use code {code} at checkout.",
+        f"Real quick I want to give a shout out to {brand} for making this episode possible. I started using {brand} {random.choice(['last month', 'a couple weeks ago', 'earlier this year'])} and it has been {random.choice(['a game changer', 'really solid', 'exactly what I needed'])}. If you go to {url} and use code {code} you get your first {random.choice(['month', 'order', 'box'])} {random.choice(['free', 'half off', 'at a discount'])}.",
     ]
     return make_messy(random.choice(templates))
 
@@ -203,9 +310,9 @@ def gen_host_read_ad(brand, url, code, genre, host, podcast_name):
 def gen_promo_code_ad(brand, url, code, genre, host, podcast_name):
     templates = [
         f"Alright so {brand} is offering our listeners an exclusive deal. Go to {url} slash {podcast_name.lower().replace(' ', '')} or use promo code {code} at checkout to get {random.choice(['fifteen', 'twenty', 'twenty five'])} percent off. That's {code} all one word all caps. {random.choice(['Deal runs through the end of the month.', 'Limited time offer so don\'t sleep on it.', 'Trust me you\'re gonna love it.'])}",
-        f"Head to {url} and use code {code} for a special discount just for our listeners. {brand} has been one of our favorite sponsors because their product is actually good. {random.choice(['I use it every single day.', 'We have been working with them for a while now and I can vouch for them.', 'Tons of our listeners have reached out saying they love it too.'])} Again that's code {code} at {url}.",
+        f"Head to {url} and use code {code} for a special discount just for our listeners. {brand} has been one of our favorite sponsors because their product is legit good. {random.choice(['I use it every single day.', 'We have been working with them for a while now and I can vouch for them.', 'Tons of our listeners have reached out saying they love it too.'])} Again that's code {code} at {url}.",
         f"If you've been thinking about trying {brand} now is the time. They're running a special where you use code {code} at checkout and get {random.choice(['a free trial', 'your first month free', 'thirty percent off'])}. That's {url} code {code}. We'll have the link in the description too.",
-        f"One more time that's {url} slash {podcast_name.lower().replace(' ', '')} use code {code} for {random.choice(['twenty', 'fifteen', 'twenty five'])} percent off your entire order. {brand} really came through for us on this deal and {random.choice(['I think you are going to love it', 'it is honestly one of the best products we have promoted', 'our listeners have been raving about it'])}.",
+        f"One more time that's {url} slash {podcast_name.lower().replace(' ', '')} use code {code} for {random.choice(['twenty', 'fifteen', 'twenty five'])} percent off your entire order. {brand} really came through for us on this deal and {random.choice(['I think you are going to love it', 'it is one of the best products we have promoted', 'our listeners have been raving about it'])}.",
     ]
     return make_messy(random.choice(templates))
 
@@ -224,8 +331,8 @@ def gen_midroll_transition(brand, url, code, genre, host, podcast_name):
     templates = [
         f"We'll get back to that in just a second but first a quick word from our sponsor. {brand} has been keeping us going through these long recording sessions. {random.choice(['Their product is genuinely excellent.', 'I cannot say enough good things about them.', 'It has become a staple in my routine.'])} Check them out at {url} and use code {code}. Alright back to what we were saying.",
         f"Let me take a quick break to tell you about {brand}. {random.choice(['If you are anything like me', 'For those of you who', 'I know a lot of our listeners'])} {random.choice(['struggle with this', 'have been looking for something like this', 'could use something to help with this'])}, {brand} is {random.choice(['the answer', 'what you need', 'a total game changer'])}. {url} slash {podcast_name.lower().replace(' ', '')} for the hookup.",
-        f"Alright quick sponsor break. Let me tell you about {brand}. So {random.choice(['I discovered them through another podcast actually', 'they reached out a while back and I was immediately interested', 'a listener actually recommended them to me'])} and I have been using them ever since. Go to {url} code {code} to save {random.choice(['fifteen', 'twenty'])} percent. OK where were we.",
-        f"Speaking of {random.choice(['things that actually work', 'good stuff', 'quality'])}, let me tell you about {brand}. {random.choice(['I have tried a lot of products in this space', 'We get pitched by sponsors all the time', 'I am pretty picky about what I recommend'])} and {brand} is one of the few that I genuinely {random.choice(['use every day', 'recommend to friends', 'stand behind'])}. {url} link in the show notes.",
+        f"Alright quick sponsor break. Let me tell you about {brand}. So {random.choice(['I discovered them through another podcast', 'they reached out a while back and I was immediately interested', 'a listener recommended them to me'])} and I have been using them ever since. Go to {url} code {code} to save {random.choice(['fifteen', 'twenty'])} percent. OK where were we.",
+        f"Speaking of {random.choice(['things that work', 'good stuff', 'quality'])}, let me tell you about {brand}. {random.choice(['I have tried a lot of products in this space', 'We get pitched by sponsors all the time', 'I am pretty picky about what I recommend'])} and {brand} is one of the few that I genuinely {random.choice(['use every day', 'recommend to friends', 'stand behind'])}. {url} link in the show notes.",
     ]
     return make_messy(random.choice(templates))
 
@@ -233,7 +340,7 @@ def gen_midroll_transition(brand, url, code, genre, host, podcast_name):
 def gen_product_testimonial_ad(brand, url, code, genre, host, podcast_name):
     templates = [
         f"OK so story time. I was {random.choice(['traveling last week', 'working late the other night', 'dealing with a really stressful week'])} and I {random.choice(['reached for', 'pulled out', 'decided to try'])} {brand} and it {random.choice(['completely saved me', 'made all the difference', 'was exactly what I needed'])}. I'm not just saying that because they sponsor us. I genuinely {random.choice(['use this every day', 'recommend this to everyone I know', 'think this is one of the best products out there'])}. {url} code {code} for a discount.",
-        f"So funny story about {brand}. I actually started using them before they ever sponsored the show. {random.choice(['My wife got me into it', 'I saw an ad on another podcast ironically', 'A friend recommended it'])} and when they reached out about sponsoring I was like absolutely. Because I already knew it was good. {random.choice(['The quality speaks for itself.', 'I was already a paying customer.', 'It just made sense.'])} Go to {url} if you want to try it.",
+        f"So funny story about {brand}. I started using them before they ever sponsored the show. {random.choice(['My wife got me into it', 'I saw an ad on another podcast ironically', 'A friend recommended it'])} and when they reached out about sponsoring I was like absolutely. Because I already knew it was good. {random.choice(['The quality speaks for itself.', 'I was already a paying customer.', 'It just made sense.'])} Go to {url} if you want to try it.",
         f"Let me share a quick personal experience with {brand}. About {random.choice(['two months', 'six weeks', 'a few weeks'])} ago I started using their {random.choice(['main product', 'premium plan', 'starter kit'])} and I have noticed a real difference. {random.choice(['My sleep has improved dramatically.', 'I am way more productive now.', 'It has genuinely changed my routine for the better.'])} I know that sounds like marketing speak but I mean it. Check them out at {url}.",
     ]
     return make_messy(random.choice(templates))
@@ -253,8 +360,8 @@ def gen_cross_promo(genre, host, podcast_name):
 def gen_subtle_ad(brand, url, code, genre, host, podcast_name):
     templates = [
         f"You know what has been helping me stay on top of all this is {brand}. I started using it a couple months ago because a friend recommended it and now I literally cannot go back. The {random.choice(['focus', 'quality', 'experience'])} is just different. Anyway they have a thing where if you go to {url} slash {podcast_name.lower().replace(' ', '')} you get twenty percent off your first order. Just throwing that out there.",
-        f"That reminds me actually. I have been using {brand} for {random.choice(['my morning routine', 'work stuff', 'personal projects'])} and it is {random.choice(['surprisingly good', 'way better than I expected', 'become kind of essential for me'])}. I think they have a deal running right now at {url} if anyone is interested. Not a hard sell just genuinely think it is worth checking out.",
-        f"Speaking of {random.choice(['good tools', 'things that work', 'being productive', 'quality stuff'])}, I have been really into {brand} lately. {random.choice(['Started as a trial and now I am fully committed.', 'Did not expect to like it this much honestly.', 'It has kind of become part of my daily routine.'])} I think there is a link in the show notes if you want to try it. {url} or something like that.",
+        f"That reminds me. I have been using {brand} for {random.choice(['my morning routine', 'work stuff', 'personal projects'])} and it is {random.choice(['surprisingly good', 'way better than I expected', 'become kind of essential for me'])}. I think they have a deal running right now at {url} if anyone is interested. Not a hard sell just genuinely think it is worth checking out.",
+        f"Speaking of {random.choice(['good tools', 'things that work', 'being productive', 'quality stuff'])}, I have been really into {brand} lately. {random.choice(['Started as a trial and now I am fully committed.', 'Did not expect to like it this much.', 'It has kind of become part of my daily routine.'])} I think there is a link in the show notes if you want to try it. {url} or something like that.",
         f"Oh also I keep forgetting to mention this but {brand} is pretty great. I know that sounds random but {random.choice(['I was using it right before we started recording', 'someone asked me about it on Twitter', 'my co-host got me into it'])} and yeah. {url} code {code} if you are curious. Anyway back to what you were saying.",
     ]
     return make_messy(random.choice(templates))
