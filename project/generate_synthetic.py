@@ -157,8 +157,32 @@ GUEST_NAMES = [
     "Rachel Green", "Dr. Ivanova", "Michael Torres", "Dr. Adebayo",
 ]
 
-FILLER_WORDS = ["you know", "like", "um", "uh", "right", "I mean",
-                "so", "well", "look"]
+# ─── REAL WHISPER TRANSCRIPT EXAMPLES ───
+# These are actual Whisper transcriptions from YouTube podcasts.
+# Key style observations:
+#   - Proper punctuation (commas, periods, apostrophes)
+#   - Proper capitalization (sentence starts, proper nouns)
+#   - Natural speech repetitions ("my, my", "we've, we've", "there, there's")
+#   - Contractions preserved ("it's", "we've", "you're", "don't")
+#   - Sentence fragments at segment boundaries
+#   - Whisper sometimes mishears words ("Invidia" for "Nvidia", "electrieman" for "Lex Fridman")
+#   - Run-on speech with commas instead of periods
+#   - No artificial filler word injection — fillers are rare and natural
+
+REAL_AD_EXAMPLES = [
+    "And in the meantime, my, my favorite answer is eliminate waste. You know, we've, we've got all that idle power. I want to evacuate it as fast as possible. Yeah, there, there's a lot of low hanging fruit here on earth. Yeah. The working utilize for the AI scaling, quick pause, quick 30 second. Thank you to our sponsors. Check them out in the description. It really is the best way to support this podcast. Go to lexfreedman.com slash sponsors.",
+    "We got perplexity for curiosity driven knowledge exploration, Shopify for selling stuff online, element for electrolytes, thin for customer service AI agents, and quote for a phone system like call text contacts for your business. Choose wise and my friends. And now back to my conversation with Jensen Kwong.",
+    "a fan on the receiving end of some of those video games, you bring joy to millions of people. It's awesome. Let me ask you about quests. But first, quick math and break. It's okay. Yeah. Quick 30 second, thank you to our sponsors. Check them out in the description. It really is the best way to support this podcast.",
+    "you build a big mm all around it quick pause for bathroom break quick 30 second thank you to our sponsors check them out in the description it really is the best way to support this podcast go to Lexfriedman.com slash sponsors we got Finn for customer service AI agents blitzy for co-generation in large code bases better help for mental health Shopify for selling stuff online code rabbit for AI powered code review and perplexity for curiosity driven knowledge exploration choose",
+    "Can you recognize these guitars from a single note? Could you recognize the Vivaan? Abs versus air Clapton? Yeah. All right. You might be right. You might be right. Quick 30 second thank you to our sponsors. Check them all in the description. It really is the best way to support this podcast. Go to lexfremen.com slash sponsors.",
+]
+
+REAL_NONAD_EXAMPLES = [
+    "And so I force everybody to think about what's the first principles, the limits, the physical limits for everything before we do anything. And we test everything against that. And so that's a good frame of mind. I don't love the other methods which is continuous improvement.",
+    "up that loop, like how do you fine tune that? So it's maximal fun or fun for the maximum number of people. Is it how difficult is that? It's extremely difficult. And not everybody's good at doing that.",
+    "social networks that people have that's fascinating so that's one important component of serial what else can we say about the psychology what motivates them if you look at some of the famous serial killers type on D John Wayne Gacy Jeffrey Domer is there other things you could say about their psychology that motivates them",
+    "Sometimes we highlight the fact that the change in nature of music and that it's the scarcity is not there. But also allows it is like every kind of music is available and so fast and so easy. It's easy to explore to commodity. It's like turning on a water faucet.",
+]
 
 PODCAST_NAMES = {
     "tech": ["The Debug Log", "Silicon Minds", "Code & Coffee", "Byte Sized", "Tech Tangent"],
@@ -174,52 +198,56 @@ PODCAST_NAMES = {
 }
 
 
-def add_filler(text, density=0.15):
-    """Insert filler words at random positions."""
+def add_speech_disfluencies(text, density=0.02):
+    """Add natural speech disfluencies matching real Whisper transcript rates.
+
+    Real data shows ~1-2% filler prevalence, not the 30-50% the old
+    add_filler() was producing. This also adds natural repetitions
+    (e.g. "I, I think", "the, the thing") which Whisper transcribes faithfully.
+
+    Disfluencies are only inserted at natural pause points (after punctuation)
+    to avoid breaking mid-phrase flow.
+    """
     words = text.split()
     result = []
     for i, w in enumerate(words):
-        if random.random() < density and i > 0 and i < len(words) - 1:
-            result.append(random.choice(FILLER_WORDS))
         result.append(w)
+        # Only insert disfluencies after natural pause points
+        if i > 2 and i < len(words) - 3 and w.endswith((".", ",", "?", "!")):
+            if random.random() < density:
+                filler = random.choices(
+                    ["I mean,", "well,", "yeah.", "right,"],
+                    weights=[20, 25, 30, 25],
+                )[0]
+                result.append(filler)
+        # Natural word repetition (~0.5% chance) — "we've, we've" style
+        elif random.random() < 0.005 and i > 0 and len(w) > 2:
+            # Insert repetition before current word
+            result.insert(-1, w.rstrip(".,!?") + ",")
     return " ".join(result)
 
 
-def lower_start(text):
-    """Randomly lowercase the first letter to simulate transcript style."""
-    if random.random() < 0.4 and text and text[0].isupper():
-        return text[0].lower() + text[1:]
-    return text
+def whisper_style(text):
+    """Make text match real Whisper transcription output.
 
+    Real Whisper output KEEPS punctuation, capitalization, and contractions.
+    Artifacts include: occasional mishearings, run-on comma splices,
+    number format variation, and sentence fragments at boundaries.
+    """
+    # Ensure proper sentence capitalization (Whisper does this)
+    sentences = text.split(". ")
+    sentences = [s[0].upper() + s[1:] if s else s for s in sentences]
+    text = ". ".join(sentences)
 
-def whisper_artifacts(text):
-    """Simulate Whisper transcription noise on clean text."""
-    import re as _re
-    words = text.split()
-    result = []
-    for w in words:
-        # Drop apostrophes (~20% chance per contraction)
-        if "'" in w and random.random() < 0.2:
-            w = w.replace("'", "")
-        # Drop commas (~30% chance)
-        if w.endswith(",") and random.random() < 0.3:
-            w = w[:-1]
-        # Drop period to create run-on (~15% chance)
-        if w.endswith(".") and random.random() < 0.15:
-            w = w[:-1]
-        # Lowercase a capitalized word mid-sentence (~10% chance)
-        if len(result) > 0 and w and w[0].isupper() and random.random() < 0.1:
-            w = w[0].lower() + w[1:]
-        result.append(w)
-    text = " ".join(result)
-    # Occasional double spaces (Whisper alignment gaps)
-    if random.random() < 0.2:
-        words = text.split()
-        if len(words) > 10:
-            idx = random.randint(5, len(words) - 5)
-            words[idx] = words[idx] + " "
-            text = " ".join(words)
-    # Occasional number format switch: "twenty" <-> "20"
+    # Occasional comma splice instead of period (very common in real data)
+    if random.random() < 0.3:
+        parts = text.split(". ")
+        if len(parts) > 2:
+            idx = random.randint(1, len(parts) - 2)
+            parts[idx] = parts[idx][0].lower() + parts[idx][1:] if parts[idx] else parts[idx]
+            text = ". ".join(parts[:idx]) + ", " + ", ".join(parts[idx:])
+
+    # Number format variation: Whisper alternates between written and numeric
     number_swaps = [
         ("fifteen", "15"), ("twenty", "20"), ("twenty five", "25"),
         ("thirty", "30"), ("fifty", "50"), ("ten", "10"),
@@ -230,30 +258,44 @@ def whisper_artifacts(text):
             text = text.replace(swap[0], swap[1], 1)
         elif swap[1] in text:
             text = text.replace(swap[1], swap[0], 1)
+
+    # Occasional slight mishearing of proper nouns (~5% chance)
+    # Mimics Whisper errors like "Invidia" for "Nvidia"
+    if random.random() < 0.05:
+        words = text.split()
+        for i, w in enumerate(words):
+            if w and w[0].isupper() and len(w) > 4 and random.random() < 0.3:
+                # Swap two adjacent letters
+                j = random.randint(1, len(w) - 2)
+                w = w[:j] + w[j+1] + w[j] + w[j+2:]
+                words[i] = w
+                break
+        text = " ".join(words)
+
     return text
 
 
 PADDING_PHRASES = [
     "And I think that is really the key thing here.",
-    "Which is something I have been thinking about a lot lately.",
+    "Which is something I have been thinking about a lot.",
     "And that is not something you hear people talk about enough.",
-    "I do not know if that makes sense but it is how I think about it.",
+    "I do not know if that makes sense, but it is how I think about it.",
     "That is just my take on it though.",
-    "It is one of those things where once you see it you cannot unsee it.",
+    "It is one of those things where once you see it, you cannot unsee it.",
     "And I think most people would agree with me on this.",
-    "Which again I know is kind of a hot take but whatever.",
-    "And look I could be wrong about this but I really do not think I am.",
     "I think the thing that people miss is how much context matters here.",
     "And that is coming from someone who has been doing this for a while.",
-    "The more I think about it the more convinced I am.",
-    "I was talking to someone about this the other day and they made a really good point.",
+    "The more I think about it, the more convinced I am.",
+    "I was talking to someone about this the other day, and they made a really good point.",
     "And I think that is worth sitting with for a second.",
-    "Like I genuinely believe this is one of those things that matters.",
     "It is wild to me that more people are not paying attention to this.",
-    "And I want to be clear I am not saying this to be controversial or anything.",
-    "Which by the way is a whole other conversation we should have at some point.",
-    "And the data backs this up too if you look at it.",
+    "And the data backs this up too, if you dig into it.",
     "I just think we need to be more honest about this stuff.",
+    "And so that is a good frame of mind.",
+    "It is in fact one of the things that makes this so interesting.",
+    "And all of a sudden, everything starts to make sense.",
+    "So that is the part that I think is really worth discussing.",
+    "And I think the consensus is that this is a much bigger deal than people realize.",
 ]
 
 
@@ -265,15 +307,17 @@ def pad_to_length(text, min_words=75, max_words=100):
     if len(words) > target:
         # Cut at a sentence-ish boundary near target
         for i in range(target, min(target + 15, len(words))):
-            if words[i - 1].endswith((".","?","!")):
+            if words[i - 1].endswith((".", "?", "!")):
                 return " ".join(words[:i])
         return " ".join(words[:target])
     while len(words) < target:
         phrase = random.choice(PADDING_PHRASES)
-        # Insert at a sentence boundary (after a period)
+        # Prefer appending at the end (80%) or after the last sentence boundary (20%)
+        # This avoids awkward mid-paragraph insertions
         insert_points = [i for i, w in enumerate(words) if w.endswith(".") or w.endswith("?")]
-        if insert_points:
-            idx = random.choice(insert_points) + 1
+        if insert_points and random.random() < 0.2:
+            # Insert after the last sentence boundary only
+            idx = insert_points[-1] + 1
             words = words[:idx] + phrase.split() + words[idx:]
         else:
             words.extend(phrase.split())
@@ -281,16 +325,14 @@ def pad_to_length(text, min_words=75, max_words=100):
 
 
 def make_messy(text):
-    """Make text feel like a real Whisper transcript."""
+    """Make text feel like a real Whisper transcript.
+
+    Real Whisper output has proper punctuation and capitalization.
+    We add sparse natural disfluencies and Whisper-style artifacts.
+    """
     text = pad_to_length(text)
-    text = add_filler(text, density=random.uniform(0.02, 0.06))
-    # Randomly drop some periods
-    if random.random() < 0.3:
-        text = text.replace(". ", " ", 1)
-    # Randomly lowercase start
-    text = lower_start(text)
-    # Apply Whisper-style transcription artifacts
-    text = whisper_artifacts(text)
+    text = add_speech_disfluencies(text, density=random.uniform(0.01, 0.03))
+    text = whisper_style(text)
     return text
 
 
@@ -298,21 +340,24 @@ def make_messy(text):
 
 def gen_host_read_ad(brand, url, code, genre, host, podcast_name):
     templates = [
-        f"So I want to take a second to talk about {brand}. I've been using it for about a month now and I gotta say it's pretty solid. {random.choice(['The quality is just there.', 'It just works really well.', 'I was skeptical at first but now I recommend it to everyone.'])} If you want to check it out head to {url} slash {podcast_name.lower().replace(' ', '')} and you'll get a special deal. Seriously go check them out.",
-        f"Alright let me tell you about something I use every day. {brand}. {random.choice(['I started using this a few weeks ago', 'My co-host turned me onto this', 'A friend recommended this to me'])} and I'm kind of hooked. The thing that sets it apart is just how {random.choice(['easy it is to use', 'well designed everything is', 'reliable it has been'])}. Head to {url} and use code {code} for {random.choice(['fifteen', 'twenty', 'twenty five'])} percent off your first order.",
-        f"Quick break to tell you about {brand}. Now I know I know every podcast is sponsored by something these days but I genuinely think this one is worth your time. {random.choice(['The customer service alone is incredible.', 'I have tried so many alternatives and nothing comes close.', 'Even my partner who is super picky about this stuff loves it.'])} Go to {url} slash {podcast_name.lower().replace(' ', '')} link is in the show notes.",
-        f"This episode is brought to you by {brand}. Look I've been in this space for a while and {brand} is one of the few products I stand behind. {random.choice(['They reached out to sponsor us and I said yes immediately because I was already a customer.', 'The team behind it really cares about quality.', 'It has made a real difference in my daily routine.'])} You can try it at {url} and use code {code} at checkout.",
-        f"Real quick I want to give a shout out to {brand} for making this episode possible. I started using {brand} {random.choice(['last month', 'a couple weeks ago', 'earlier this year'])} and it has been {random.choice(['a game changer', 'really solid', 'exactly what I needed'])}. If you go to {url} and use code {code} you get your first {random.choice(['month', 'order', 'box'])} {random.choice(['free', 'half off', 'at a discount'])}.",
+        f"So I want to take a second to talk about {brand}. I've been using it for about a month now and I gotta say it's pretty solid. {random.choice(['The quality is just there.', 'It just works really well.', 'I was skeptical at first but now I recommend it to everyone.'])} If you want to check it out, head to {url} slash {podcast_name.lower().replace(' ', '')} and you'll get a special deal. Seriously, go check them out.",
+        f"Alright, let me tell you about something I use every day. {brand}. {random.choice(['I started using this a few weeks ago', 'My co-host turned me onto this', 'A friend recommended this to me'])} and I'm kind of hooked. The thing that sets it apart is just how {random.choice(['easy it is to use.', 'well designed everything is.', 'reliable it has been.'])} Head to {url} and use code {code} for {random.choice(['fifteen', 'twenty', 'twenty five'])} percent off your first order.",
+        f"Quick break to tell you about {brand}. Now I know, I know every podcast is sponsored by something these days, but I genuinely think this one is worth your time. {random.choice(['The customer service alone is incredible.', 'I have tried so many alternatives and nothing comes close.', 'Even my partner who is super picky about this stuff loves it.'])} Go to {url} slash {podcast_name.lower().replace(' ', '')}, link is in the show notes.",
+        f"This episode is brought to you by {brand}. Look, I've been in this space for a while and {brand} is one of the few products I actually stand behind. {random.choice(['They reached out to sponsor us and I said yes immediately because I was already a customer.', 'The team behind it really cares about quality.', 'It has made a real difference in my daily routine.'])} You can try it at {url} and use code {code} at checkout.",
+        # Modeled after real Lex Fridman ad style: mid-conversation transition
+        f"Yeah. {random.choice(['Right, right.', 'Exactly.', 'Yeah, yeah.'])} Quick pause, quick 30 second. Thank you to our sponsors. Check them out in the description. It really is the best way to support this podcast. Go to {url} slash sponsors. We have got {brand} for {random.choice(['making your life easier', 'the thing we just talked about', 'quality you can count on'])}. Use code {code} for a special deal.",
+        # Sponsor list style (very common in real data)
+        f"We got {brand} for {random.choice(['productivity', 'health and wellness', 'quality tools', 'everyday essentials'])}, {random.choice(['Shopify for selling stuff online, ', 'BetterHelp for mental health, ', ''])}and {random.choice(['element for electrolytes', 'perplexity for curiosity driven knowledge exploration', 'a great deal on their website'])}. Check them out in the description. {random.choice(['Choose wisely, my friends.', 'It really helps support the show.'])} And now back to our conversation.",
     ]
     return make_messy(random.choice(templates))
 
 
 def gen_promo_code_ad(brand, url, code, genre, host, podcast_name):
     templates = [
-        f"Alright so {brand} is offering our listeners an exclusive deal. Go to {url} slash {podcast_name.lower().replace(' ', '')} or use promo code {code} at checkout to get {random.choice(['fifteen', 'twenty', 'twenty five'])} percent off. That's {code} all one word all caps. {random.choice(['Deal runs through the end of the month.', 'Limited time offer so don\'t sleep on it.', 'Trust me you\'re gonna love it.'])}",
-        f"Head to {url} and use code {code} for a special discount just for our listeners. {brand} has been one of our favorite sponsors because their product is legit good. {random.choice(['I use it every single day.', 'We have been working with them for a while now and I can vouch for them.', 'Tons of our listeners have reached out saying they love it too.'])} Again that's code {code} at {url}.",
-        f"If you've been thinking about trying {brand} now is the time. They're running a special where you use code {code} at checkout and get {random.choice(['a free trial', 'your first month free', 'thirty percent off'])}. That's {url} code {code}. We'll have the link in the description too.",
-        f"One more time that's {url} slash {podcast_name.lower().replace(' ', '')} use code {code} for {random.choice(['twenty', 'fifteen', 'twenty five'])} percent off your entire order. {brand} really came through for us on this deal and {random.choice(['I think you are going to love it', 'it is one of the best products we have promoted', 'our listeners have been raving about it'])}.",
+        f"Alright, so {brand} is offering our listeners an exclusive deal. Go to {url} slash {podcast_name.lower().replace(' ', '')} or use promo code {code} at checkout to get {random.choice(['fifteen', 'twenty', 'twenty five'])} percent off. That is {code}, all one word, all caps. {random.choice(['Deal runs through the end of the month.', 'Limited time offer so do not sleep on it.', 'Trust me, you are gonna love it.'])}",
+        f"Head to {url} and use code {code} for a special discount just for our listeners. {brand} has been one of our favorite sponsors because their product is legit good. {random.choice(['I use it every single day.', 'We have been working with them for a while now and I can vouch for them.', 'Tons of our listeners have reached out saying they love it too.'])} Again, that is code {code} at {url}.",
+        f"If you have been thinking about trying {brand}, now is the time. They are running a special where you use code {code} at checkout and get {random.choice(['a free trial', 'your first month free', 'thirty percent off'])}. That is {url}, code {code}. We will have the link in the description too.",
+        f"One more time, that is {url} slash {podcast_name.lower().replace(' ', '')}, use code {code} for {random.choice(['twenty', 'fifteen', 'twenty five'])} percent off your entire order. {brand} really came through for us on this deal and {random.choice(['I think you are going to love it.', 'it is one of the best products we have promoted.', 'our listeners have been raving about it.'])}",
     ]
     return make_messy(random.choice(templates))
 
@@ -320,19 +365,20 @@ def gen_promo_code_ad(brand, url, code, genre, host, podcast_name):
 def gen_preroll_ad(brand, url, code, genre, host, podcast_name):
     templates = [
         f"This episode of {podcast_name} is brought to you by {brand}. Visit {url} to learn more. Now on to the show.",
-        f"Before we get started a quick word from our sponsor {brand}. Check them out at {url} and use code {code} for a special offer. Alright let's dive in.",
-        f"Today's episode is sponsored by {brand}. {random.choice(['The best in the business.', 'Making your life easier one day at a time.', 'Quality you can count on.'])} Visit {url} for more. Now let's get into it.",
-        f"{podcast_name} is supported by {brand}. Go to {url} slash {podcast_name.lower().replace(' ', '')} for {random.choice(['an exclusive deal', 'a free trial', 'twenty percent off'])}. Alright here we go.",
+        f"Before we get started, a quick word from our sponsor {brand}. Check them out at {url} and use code {code} for a special offer. Alright, let us dive in.",
+        f"Today's episode is sponsored by {brand}. {random.choice(['The best in the business.', 'Making your life easier one day at a time.', 'Quality you can count on.'])} Visit {url} for more. Now let us get into it.",
+        f"{podcast_name} is supported by {brand}. Go to {url} slash {podcast_name.lower().replace(' ', '')} for {random.choice(['an exclusive deal', 'a free trial', 'twenty percent off'])}. Alright, here we go.",
     ]
     return make_messy(random.choice(templates))
 
 
 def gen_midroll_transition(brand, url, code, genre, host, podcast_name):
     templates = [
-        f"We'll get back to that in just a second but first a quick word from our sponsor. {brand} has been keeping us going through these long recording sessions. {random.choice(['Their product is genuinely excellent.', 'I cannot say enough good things about them.', 'It has become a staple in my routine.'])} Check them out at {url} and use code {code}. Alright back to what we were saying.",
-        f"Let me take a quick break to tell you about {brand}. {random.choice(['If you are anything like me', 'For those of you who', 'I know a lot of our listeners'])} {random.choice(['struggle with this', 'have been looking for something like this', 'could use something to help with this'])}, {brand} is {random.choice(['the answer', 'what you need', 'a total game changer'])}. {url} slash {podcast_name.lower().replace(' ', '')} for the hookup.",
-        f"Alright quick sponsor break. Let me tell you about {brand}. So {random.choice(['I discovered them through another podcast', 'they reached out a while back and I was immediately interested', 'a listener recommended them to me'])} and I have been using them ever since. Go to {url} code {code} to save {random.choice(['fifteen', 'twenty'])} percent. OK where were we.",
-        f"Speaking of {random.choice(['things that work', 'good stuff', 'quality'])}, let me tell you about {brand}. {random.choice(['I have tried a lot of products in this space', 'We get pitched by sponsors all the time', 'I am pretty picky about what I recommend'])} and {brand} is one of the few that I genuinely {random.choice(['use every day', 'recommend to friends', 'stand behind'])}. {url} link in the show notes.",
+        f"We will get back to that in just a second, but first a quick word from our sponsor. {brand} has been keeping us going through these long recording sessions. {random.choice(['Their product is genuinely excellent.', 'I cannot say enough good things about them.', 'It has become a staple in my routine.'])} Check them out at {url} and use code {code}. Alright, back to what we were saying.",
+        f"Let me take a quick break to tell you about {brand}. {random.choice(['If you are anything like me,', 'For those of you who', 'I know a lot of our listeners'])} {random.choice(['struggle with this,', 'have been looking for something like this,', 'could use something to help with this,'])} {brand} is {random.choice(['the answer.', 'what you need.', 'a total game changer.'])} {url} slash {podcast_name.lower().replace(' ', '')} for the hookup.",
+        # Real-style quick transition
+        f"Yeah. Quick pause, quick 30 second. Thank you to our sponsors. Check them out in the description. It really is the best way to support this podcast. We have got {brand} for {random.choice(['making things easier', 'the quality stuff', 'what you need'])}. Go to {url} and use code {code}. And now back to our conversation.",
+        f"Speaking of {random.choice(['things that work,', 'good stuff,', 'quality,'])} let me tell you about {brand}. {random.choice(['I have tried a lot of products in this space', 'We get pitched by sponsors all the time', 'I am pretty picky about what I recommend'])} and {brand} is one of the few that I genuinely {random.choice(['use every day.', 'recommend to friends.', 'stand behind.'])} {url}, link in the show notes.",
     ]
     return make_messy(random.choice(templates))
 
@@ -386,13 +432,13 @@ INTERVIEW_TOPICS = {
 def gen_interview(genre, host, guest):
     topic = random.choice(INTERVIEW_TOPICS.get(genre, ["general topics"]))
     templates = [
-        f"So when you first started looking into {topic} what was the thing that surprised you the most. Because I think a lot of people have this surface level understanding of it but there is so much more going on underneath. Can you walk us through what you discovered when you really dug into it.",
-        f"That is fascinating. So let me ask you this. When it comes to {topic} do you think we are heading in the right direction or are there some fundamental things that need to change. Because from the outside looking in it seems like there are some real problems that nobody is talking about.",
-        f"I want to go back to something you said earlier about {topic}. You mentioned that there was this moment where everything kind of clicked for you. Can you tell our listeners about that. Because I think a lot of people are in that same position where they are trying to figure this stuff out.",
-        f"OK so {guest} I have to ask you about {topic} because I know you have spent a lot of time thinking about this. What do you think is the biggest misconception people have. Because I see a lot of takes online and most of them seem to miss the point entirely.",
-        f"So {guest} you have been working on {topic} for how long now. And when you first got into it did you expect to find what you found. Because some of the data you shared with me before the show is pretty surprising honestly.",
-        f"Here is what I do not understand about {topic} and maybe you can help me with this. Everyone keeps saying one thing but then the data shows something completely different. How do you reconcile that. Is it just that people do not want to hear the truth or is there something else going on.",
-        f"That is a great point. And I think it connects to what we were talking about before with {topic}. {guest} when you present this research to people what is the most common pushback you get. Because I imagine not everyone is receptive to what you are finding.",
+        f"So when you first started looking into {topic}, what was the thing that surprised you the most? Because I think a lot of people have this surface level understanding of it, but there is so much more going on underneath. Can you walk us through what you discovered when you really dug into it?",
+        f"That is fascinating. So let me ask you this. When it comes to {topic}, do you think we are heading in the right direction or are there some fundamental things that need to change? Because from the outside looking in, it seems like there are some real problems that nobody is talking about.",
+        f"I want to go back to something you said earlier about {topic}. You mentioned that there was this moment where everything kind of clicked for you. Can you tell our listeners about that? Because I think a lot of people are in that same position where they are trying to figure this stuff out.",
+        f"OK, so {guest}, I have to ask you about {topic} because I know you have spent a lot of time thinking about this. What do you think is the biggest misconception people have? Because I see a lot of takes online and most of them seem to miss the point entirely.",
+        f"So {guest}, you have been working on {topic} for how long now? And when you first got into it, did you expect to find what you found? Because some of the data you shared with me before the show is pretty surprising.",
+        f"Here is what I do not understand about {topic}, and maybe you can help me with this. Everyone keeps saying one thing, but then the data shows something completely different. How do you reconcile that? Is it just that people do not want to hear the truth, or is there something else going on?",
+        f"That is a great point. And I think it connects to what we were talking about before with {topic}. {guest}, when you present this research to people, what is the most common pushback you get? Because I imagine not everyone is receptive to what you are finding.",
     ]
     return make_messy(random.choice(templates))
 
