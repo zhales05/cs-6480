@@ -22,14 +22,17 @@ EXPECTED_AD_CATEGORIES = {
 }
 
 EXPECTED_NONAD_CATEGORIES = {
-    "interview": 200,
-    "monologue": 150,
-    "storytelling": 150,
+    "interview": 150,
+    "monologue": 125,
+    "storytelling": 125,
     "technical_discussion": 100,
-    "banter": 100,
-    "intro_outro": 100,
-    "news_recap": 100,
+    "banter": 75,
+    "intro_outro": 75,
+    "news_recap": 75,
     "product_mention_organic": 100,
+    "self_promotion": 75,
+    "editorial_review": 50,
+    "url_mention_editorial": 50,
 }
 
 VALID_GENRES = {

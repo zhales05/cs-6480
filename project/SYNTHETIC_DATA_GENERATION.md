@@ -48,14 +48,17 @@ Generate across these categories with approximate counts:
 
 | Category | Count | Description |
 |---|---|---|
-| `interview` | 200 | Host interviewing a guest — questions, answers, back-and-forth. |
-| `monologue` | 150 | Host speaking solo about the episode's topic. |
-| `storytelling` | 150 | Narrative segments — true crime, history, personal anecdotes. |
+| `interview` | 150 | Host interviewing a guest — questions, answers, back-and-forth. |
+| `monologue` | 125 | Host speaking solo about the episode's topic. |
+| `storytelling` | 125 | Narrative segments — true crime, history, personal anecdotes. |
 | `technical_discussion` | 100 | In-depth technical or educational content. |
-| `banter` | 100 | Casual conversation, jokes, co-host chatter. |
-| `intro_outro` | 100 | Episode introductions and closings (NOT ads — things like "welcome to the show" or "thanks for listening"). |
-| `news_recap` | 100 | Summarizing news stories or current events. |
-| `product_mention_organic` | 100 | Genuine, unpaid discussion of a product or brand. This is critical for avoiding false positives. |
+| `banter` | 75 | Casual conversation, jokes, co-host chatter. |
+| `intro_outro` | 75 | Episode introductions and closings (NOT ads — things like "welcome to the show" or "thanks for listening"). |
+| `news_recap` | 75 | Summarizing news stories or current events. |
+| `product_mention_organic` | 100 | Genuine, unpaid discussion of a product or brand. Critical for avoiding false positives. |
+| `self_promotion` | 75 | Host promoting their own Patreon, merch, book, tour, or side project. Sounds ad-like but is NOT a paid sponsorship. |
+| `editorial_review` | 50 | Unpaid comparison or review of real products/brands. Evaluative language without sponsorship. |
+| `url_mention_editorial` | 50 | Mentions URLs or links in an informational/editorial context (articles, papers, courses). |
 
 ---
 

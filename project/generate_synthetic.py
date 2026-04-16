@@ -41,14 +41,17 @@ AD_TARGETS = {
 }
 
 NONAD_TARGETS = {
-    "interview": 200,
-    "monologue": 150,
-    "storytelling": 150,
+    "interview": 150,
+    "monologue": 125,
+    "storytelling": 125,
     "technical_discussion": 100,
-    "banter": 100,
-    "intro_outro": 100,
-    "news_recap": 100,
+    "banter": 75,
+    "intro_outro": 75,
+    "news_recap": 75,
     "product_mention_organic": 100,
+    "self_promotion": 75,
+    "editorial_review": 50,
+    "url_mention_editorial": 50,
 }
 
 ad_needed = {cat: max(0, target - existing_cat_counts.get(cat, 0)) for cat, target in AD_TARGETS.items()}
@@ -561,6 +564,61 @@ def gen_product_mention_organic(genre, host):
     return make_messy(random.choice(templates))
 
 
+def gen_self_promotion(genre, host, podcast_name):
+    """Host promoting their own stuff — Patreon, merch, book, tour, side project.
+    Sounds ad-like but is NOT a paid sponsorship."""
+    patreon_tiers = ["five bucks a month", "three dollars a month", "just a dollar a month"]
+    templates = [
+        f"Real quick before we move on. If you enjoy the show and you want to support us directly, we have a Patreon. It is patreon.com slash {podcast_name.lower().replace(' ', '')}. For {random.choice(patreon_tiers)} you get early access to episodes and a shoutout on the show. We do not have a huge production budget so every little bit helps us keep doing this. No pressure at all but it does mean a lot.",
+        f"Oh I keep forgetting to mention this. I wrote a book. It is called {random.choice(['The Long Game', 'Thinking Out Loud', 'Notes From the Field', 'Behind the Mic', 'Unfiltered'])} and it is basically {random.choice(['everything I have learned doing this show for the last four years', 'a collection of essays about the stuff we talk about on here', 'my attempt at putting all of this into a coherent narrative'])}. You can find it on Amazon or wherever you buy books. I am really proud of how it turned out.",
+        f"Also I am doing a live show in {random.choice(['Denver', 'Austin', 'Portland', 'Brooklyn', 'Chicago', 'LA'])} on {random.choice(['March fifteenth', 'April twenty second', 'May third', 'June tenth'])}. Tickets are available on our website. It is going to be a really fun time. We did one last year and it sold out which was insane. So if you want to come grab tickets before they are gone.",
+        f"By the way we just launched a merch store. I know I know every podcast has merch now but ours is actually good. {random.choice(['We spent like three months designing the shirts.', 'The hoodies are genuinely comfortable.', 'We went with a local printer so the quality is really nice.'])} Check it out at {podcast_name.lower().replace(' ', '')}.com slash shop. All the profits go back into making the show better.",
+        f"I have been working on a side project that I am really excited about. It is a {random.choice(['newsletter', 'YouTube channel', 'companion podcast', 'blog'])} called {random.choice(['Deep Cuts', 'The B Side', 'Extra Credit', 'Off the Record'])} where I {random.choice(['go deeper on topics we can only scratch the surface of here', 'share all the stuff that does not make it into the episodes', 'interview people in a more casual long form format'])}. You can find it if you search for it. I would love for you to check it out.",
+        f"Quick thing. We are trying to hit {random.choice(['ten thousand', 'fifty thousand', 'a hundred thousand'])} subscribers on YouTube. We are so close. If you watch the video version of this show and you have not subscribed yet, please hit that button. It sounds silly but it actually makes a huge difference for us with the algorithm and helps new people find the show.",
+    ]
+    return make_messy(random.choice(templates))
+
+
+def gen_editorial_review(genre, host):
+    """Unpaid editorial discussion comparing or reviewing products/brands.
+    Mentions brand names and evaluative language but is NOT sponsored."""
+    review_topics = {
+        "tech": [
+            ("So we tested five different VPN services last week. NordVPN, ExpressVPN, Surfshark, Proton, and Mullvad. And honestly the results were not what I expected. Mullvad was the fastest by a decent margin but the interface is kind of rough. NordVPN was the most polished but also the most expensive. If I had to pick one for most people I would probably say Proton because it hits this sweet spot of privacy features and usability.",
+             "I have been comparing note taking apps for a video I am working on. Notion, Obsidian, Apple Notes, and Bear. And here is the thing that nobody talks about. For ninety percent of people Apple Notes is genuinely good enough. Like unless you need databases or backlinks or whatever, just use the thing that is already on your phone. Obsidian is amazing if you are technical but the learning curve is steep."),
+            ("We did a blind taste test with four different AI coding assistants. GitHub Copilot, Cursor, Codeium, and Tabnine. Had three of our developer friends try each one for a week without knowing which was which. The results were fascinating. Two out of three preferred Cursor for complex tasks but Copilot for quick autocomplete. Tabnine was surprisingly good for boilerplate.",
+             "I have been looking at budget monitors and I want to share what I found because I think a lot of people overspend on displays. The LG twenty seven inch IPS that everyone recommends is fine but the Dell one is actually better if you care about color accuracy. And if you just need something for coding the cheapest option from ASUS is perfectly adequate."),
+        ],
+        "health/wellness": [
+            ("I tried four different meditation apps over the past month. Headspace, Calm, Waking Up, and Insight Timer. And I have to be honest, the free version of Insight Timer was better than the paid versions of the other three for my use case. Calm has the best sleep stories though. Headspace felt too gamified for me personally.",
+             "We looked at protein powders because I get asked about this constantly. Optimum Nutrition, MyProtein, Orgain, and Garden of Life. The taste differences are huge. Optimum Nutrition chocolate is still the gold standard in my opinion. Garden of Life if you want plant based but the texture takes some getting used to."),
+        ],
+        "business": [
+            ("I have been comparing project management tools for our team. We tried Asana, Linear, Notion, and Monday dot com. Monday has the best marketing but honestly the product is kind of bloated. Linear is gorgeous and fast but it is really built for engineering teams. Asana is the safe corporate choice. We ended up going with Notion because we were already using it for docs.",
+             "Someone asked me about CRM software the other day and I went down a rabbit hole. Salesforce is obviously the gorilla in the room but it is absurdly expensive for small teams. HubSpot free tier is genuinely impressive. Pipedrive is the one I always recommend to startups because it is simple and does what you need."),
+        ],
+    }
+    # Get genre-specific reviews or fall back to tech
+    genre_reviews = review_topics.get(genre, review_topics["tech"])
+    pair = random.choice(genre_reviews)
+    text = random.choice(pair)
+    return make_messy(text)
+
+
+def gen_url_mention_editorial(genre, host):
+    """Mentions URLs or links in a purely editorial/informational context.
+    Contains URL patterns that might trigger ad detection but are NOT ads."""
+    templates = [
+        f"There is a really good article about this on {random.choice(['the Atlantic', 'Wired', 'the New York Times', 'Ars Technica', 'the Verge'])}. I will put the link in the show notes but if you search for {random.choice(['the headline it should come right up', 'it you will find it pretty easily', 'the author name plus the topic you will get it'])}. It completely changed how I think about this issue. The author spent {random.choice(['six months', 'a year', 'two years'])} reporting on it.",
+        f"If you want to learn more about this there is a free course on {random.choice(['Coursera', 'MIT OpenCourseWare', 'Khan Academy', 'YouTube actually'])}. I took it last year and it was excellent. {random.choice(['The professor is from Stanford and she explains everything so clearly.', 'It is self paced so you can do it whenever.', 'The whole thing is about ten hours and it covers everything we just talked about.'])} I will drop the link in the description.",
+        f"I was reading this thread on {random.choice(['Hacker News', 'Reddit', 'Twitter', 'Mastodon'])} about {random.choice(['exactly this topic', 'something related', 'a similar situation'])} and the top comment made a point I had not considered. I will try to find it and link it. Basically the argument was that {random.choice(['the conventional wisdom is completely wrong on this', 'we are looking at this the wrong way', 'the data tells a different story than the narrative'])}.",
+        f"There is this blog post by {random.choice(['a researcher at Google', 'a professor at MIT', 'an independent journalist', 'someone who used to work in the industry'])} that goes into way more detail than I can here. I think the URL is something like {random.choice(['their name dot com slash the topic', 'medium dot com slash something', 'substack'])} but I will find the exact link and put it in the show notes for you.",
+        f"So the original paper is available on {random.choice(['arXiv', 'PubMed', 'SSRN', 'Google Scholar'])} if you want to read it yourself. I will link to it. It is pretty dense but the abstract gives you the key findings. {random.choice(['The sample size was over ten thousand participants which is impressive.', 'They replicated the results three times which is rare.', 'The methodology section is worth reading even if you skip the rest.'])} The DOI is in the show notes.",
+        f"I found this great breakdown on YouTube by {random.choice(['this channel I follow', 'someone with like fifty subscribers who deserves way more', 'a professor who posts her lectures'])}. It is about {random.choice(['forty minutes', 'twenty minutes', 'an hour'])} long but so worth it. {random.choice(['The animations really help visualize the concept.', 'They use real data which makes it way more convincing.', 'It is the clearest explanation I have found anywhere.'])} I will link to it below.",
+    ]
+    return make_messy(random.choice(templates))
+
+
 # ─── EPISODE GENERATION ───
 
 def generate_episode(ep_num, genre, segments_pool):
@@ -677,6 +735,12 @@ def generate_episode(ep_num, genre, segments_pool):
             text = gen_news_recap(genre, host)
         elif cat == "product_mention_organic":
             text = gen_product_mention_organic(genre, host)
+        elif cat == "self_promotion":
+            text = gen_self_promotion(genre, host, podcast_name)
+        elif cat == "editorial_review":
+            text = gen_editorial_review(genre, host)
+        elif cat == "url_mention_editorial":
+            text = gen_url_mention_editorial(genre, host)
         else:
             continue
 
